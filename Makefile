@@ -27,9 +27,9 @@ ifdef FLAGS
 
 	ifeq ($(findstring INTEL, $(DFLAGS)), INTEL)
 		FC      = mpiifort
-		FFLAGS  = -O2 -align array64byte
+		FFLAGS  = -O2 -fPIC -align array64byte
 		CC      = mpiicpc
-		CFLAGS  = -O2
+		CFLAGS  = -O2 -fPIC
 		MOD_DIR = -module ./include
 	endif
 
