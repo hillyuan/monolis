@@ -609,6 +609,50 @@ void monolis_add_scalar_to_sparse_matrix(
     val);
 }
 
+/* set BCSR information */
+void monolis_set_matrix_BCSR(
+  MONOLIS* mat,
+  int      n,
+  int      np,
+  int      ndof,
+  int      nz,
+  double*  A,
+  int*     index,
+  int*     item){
+
+  mat->mat.N = n;
+  mat->mat.NP = np;
+  mat->mat.NDOF = ndof;
+  mat->mat.NZ = nz;
+  mat->mat.A = (double*)calloc(ndof*ndof*nz, sizeof(double));
+  mat->mat.X = (double*)calloc(ndof*np, sizeof(double));
+  mat->mat.B = (double*)calloc(ndof*np, sizeof(double));
+  mat->mat.index = (int* )calloc(np+1, sizeof(int));
+  mat->mat.item = (int*)calloc(nz, sizeof(int));
+
+  int i;
+  for(i = 1; i < np + 1; i++) {
+    mat->mat.index[i] = index[i];
+  }
+
+  for(i = 1; i < nz + 1; i++) {
+    mat->mat.item[i] = item[i];
+  }
+
+  mat->mat.indexR = (int*)calloc(np+1, sizeof(int));
+  mat->mat.itemR = (int*)calloc(nz, sizeof(int));
+  mat->mat.permR = (int*)calloc(nz, sizeof(int));
+
+  monolis_get_CRR_format(
+    np,
+    nz,
+    mat->mat.index,
+    mat->mat.item,
+    mat->mat.indexR,
+    mat->mat.itemR,
+    mat->mat.permR);
+}
+
 void monolis_set_Dirichlet_bc(
   MONOLIS* mat,
   double*  b,
@@ -636,6 +680,53 @@ void monolis_set_Dirichlet_bc(
     val);
 }
 
+/* get communication table */
+void monolis_com_get_comm_table(
+  MONOLIS* mat,
+  int      n,
+  int      np,
+  int*     nid){
+  int n_neib_recv;
+  int n_recv_item;
+  int n_neib_send;
+  int n_send_item;
+
+  monolis_com_get_comm_table_analysis_c_main(
+    n,
+    np,
+    nid,
+    &n_neib_recv,
+    &n_recv_item,
+    &n_neib_send,
+    &n_send_item,
+    mat->com.comm);
+
+  mat->com.recv_n_neib = n_neib_recv;
+  mat->com.recv_neib_pe = (int*)calloc(n_neib_recv, sizeof(int));
+  mat->com.recv_index = (int*)calloc(n_neib_recv + 1, sizeof(int));
+  mat->com.recv_item = (int*)calloc(n_recv_item, sizeof(int));
+
+  mat->com.send_n_neib = n_neib_send;
+  mat->com.send_neib_pe = (int*)calloc(n_neib_send, sizeof(int));
+  mat->com.send_index = (int*)calloc(n_neib_send + 1, sizeof(int));
+  mat->com.send_item = (int*)calloc(n_send_item, sizeof(int));
+
+  monolis_com_get_comm_table_set_c_main(
+    n,
+    np,
+    nid,
+    mat->com.comm,
+    mat->com.recv_n_neib,
+    n_recv_item,
+    mat->com.recv_neib_pe,
+    mat->com.recv_index,
+    mat->com.recv_item,
+    mat->com.send_n_neib,
+    n_send_item,
+    mat->com.send_neib_pe,
+    mat->com.send_index,
+    mat->com.send_item);
+}
 
 void monolis_matvec_product(
   MONOLIS* mat,
