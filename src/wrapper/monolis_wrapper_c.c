@@ -206,6 +206,7 @@ void monolis_initialize(
     mat->com.comm = monolis_get_global_comm();
     mat->com.commsize = monolis_get_global_commsize();
     //mat->com.input_file_dir = input_file_dir;
+    if ( input_file_dir == NULL ) return;
     monolis_com_input_comm_table(mat, input_file_dir);
 }
 
