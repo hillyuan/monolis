@@ -84,7 +84,7 @@ contains
         Y(i) = X(i)
       enddo
     else
-      stop "monolis_precond_apply"
+      stop "ERROR: monolis_precond_not_defined!"
     endif
 
     t2 = monolis_get_time()
