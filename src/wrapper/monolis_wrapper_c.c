@@ -153,11 +153,9 @@ void monolis_com_input_comm_table(
   fclose(fp);
 }
 
-void monolis_initialize(
-  MONOLIS*    mat,
-  const char* input_file_dir)
+void monolis_prm_initialize(
+  MONOLIS*    mat)
 {
-    // prm
     mat->prm.method = 1;
     mat->prm.precond = 1;
     mat->prm.maxiter = 1000;
@@ -183,7 +181,11 @@ void monolis_initialize(
     mat->prm.tcomm_dotp = 0.0;
     mat->prm.tcomm_spmv = 0.0;
 
-    // mat
+}
+
+void monolis_com_initialize(
+  MONOLIS*    mat)
+{
     mat->mat.A = NULL;
     mat->mat.X = NULL;
     mat->mat.B = NULL;
@@ -196,8 +198,11 @@ void monolis_initialize(
     mat->mat.NP = 0;
     mat->mat.NZ = 0;
     mat->mat.NDOF = 0;
+}
 
-    // comm
+void monolis_mat_initialize(
+  MONOLIS*    mat)
+{
     mat->com.recv_n_neib = 0;
     mat->com.send_n_neib = 0;
     mat->com.internal_nnode = 0;
@@ -205,8 +210,15 @@ void monolis_initialize(
     mat->com.myrank = monolis_get_global_myrank();
     mat->com.comm = monolis_get_global_comm();
     mat->com.commsize = monolis_get_global_commsize();
-    //mat->com.input_file_dir = input_file_dir;
-    if ( input_file_dir == NULL ) return;
+}
+
+void monolis_initialize(
+  MONOLIS*    mat,
+  const char* input_file_dir)
+{
+    monolis_prm_initialize(mat);
+    monolis_com_initialize(mat);
+    monolis_mat_initialize(mat);
     monolis_com_input_comm_table(mat, input_file_dir);
 }
 
@@ -610,6 +622,40 @@ void monolis_add_scalar_to_sparse_matrix(
     val);
 }
 
+void monolis_get_scalar_from_sparse_matrix(
+  MONOLIS* mat,
+  int      i,
+  int      j,
+  int      submat_i,
+  int      submat_j,
+  double*  val,
+  bool*    is_find)
+{
+  int n = mat->mat.NP;
+  int nz = mat->mat.NZ;
+  int ndof = mat->mat.NDOF;
+  int is_find_t = 0;
+
+  monolis_get_scalar_from_sparse_matrix_c_main(
+    n,
+    nz,
+    ndof,
+    mat->mat.index,
+    mat->mat.item,
+    mat->mat.A,
+    i,
+    j,
+    submat_i,
+    submat_j,
+    val,
+    &is_find_t);
+
+  *is_find = false;
+  if(is_find_t == 1){
+    *is_find = true;
+  }
+}
+
 /* set BCSR information */
 void monolis_set_matrix_BCSR(
   MONOLIS* mat,
@@ -632,12 +678,16 @@ void monolis_set_matrix_BCSR(
   mat->mat.item = (int*)calloc(nz, sizeof(int));
 
   int i;
-  for(i = 1; i < np + 1; i++) {
+  for(i = 0; i < np + 1; i++) {
     mat->mat.index[i] = index[i];
   }
 
-  for(i = 1; i < nz + 1; i++) {
+  for(i = 0; i < nz; i++) {
     mat->mat.item[i] = item[i];
+  }
+
+  for(i = 0; i < ndof*ndof*nz; i++) {
+    mat->mat.A[i] = A[i];
   }
 
   mat->mat.indexR = (int*)calloc(np+1, sizeof(int));
@@ -686,7 +736,7 @@ void monolis_com_get_comm_table(
   MONOLIS* mat,
   int      n,
   int      np,
-  int*     nid){
+  int*     glonal_node_id){
   int n_neib_recv;
   int n_recv_item;
   int n_neib_send;
@@ -695,7 +745,7 @@ void monolis_com_get_comm_table(
   monolis_com_get_comm_table_analysis_c_main(
     n,
     np,
-    nid,
+    glonal_node_id,
     &n_neib_recv,
     &n_recv_item,
     &n_neib_send,
@@ -715,7 +765,7 @@ void monolis_com_get_comm_table(
   monolis_com_get_comm_table_set_c_main(
     n,
     np,
-    nid,
+    glonal_node_id,
     mat->com.comm,
     mat->com.recv_n_neib,
     n_recv_item,
