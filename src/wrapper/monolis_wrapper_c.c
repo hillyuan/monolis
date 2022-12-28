@@ -704,49 +704,6 @@ void monolis_set_matrix_BCSR(
     mat->mat.permR);
 }
 
-/* init BCSR information */
-void monolis_init_matrix_BCSR(
-  MONOLIS* mat,
-  int      n,
-  int      np,
-  int      ndof,
-  int      nz,
-  int*     index,
-  int*     item){
-
-  mat->mat.N = n;
-  mat->mat.NP = np;
-  mat->mat.NDOF = ndof;
-  mat->mat.NZ = nz;
-  mat->mat.A = (double*)calloc(ndof*ndof*nz, sizeof(double));
-  mat->mat.X = (double*)calloc(ndof*np, sizeof(double));
-  mat->mat.B = (double*)calloc(ndof*np, sizeof(double));
-  mat->mat.index = (int* )calloc(np+1, sizeof(int));
-  mat->mat.item = (int*)calloc(nz, sizeof(int));
-
-  int i;
-  for(i = 0; i < np + 1; i++) {
-    mat->mat.index[i] = index[i];
-  }
-
-  for(i = 0; i < nz; i++) {
-    mat->mat.item[i] = item[i] + 1;
-  }
-
-  mat->mat.indexR = (int*)calloc(np+1, sizeof(int));
-  mat->mat.itemR = (int*)calloc(nz, sizeof(int));
-  mat->mat.permR = (int*)calloc(nz, sizeof(int));
-
-  monolis_get_CRR_format(
-    np,
-    nz,
-    mat->mat.index,
-    mat->mat.item,
-    mat->mat.indexR,
-    mat->mat.itemR,
-    mat->mat.permR);
-}
-
 void monolis_set_matrix_BCSR_mat_val(
   MONOLIS* mat,
   int      ndof,
@@ -756,24 +713,6 @@ void monolis_set_matrix_BCSR_mat_val(
   int i;
   for(i = 0; i < ndof*ndof*nz; i++) {
     mat->mat.A[i] = A[i];
-  }
-}
-
-void monolis_set_matrix_BCSR_val(
-  MONOLIS* mat,
-  int      nz1,
-  double*  A1,
-  int      nz2,
-  double*  A2){
-
-  int i,n;
-  int bdof = mat->mat.NDOF * mat->mat.NDOF;
-  for(i = 0; i < bdof*nz1; i++) {
-    mat->mat.A[i] = A1[i];
-  }
-  n =i;
-  for(i = 0; i < bdof*nz2; i++) {
-    mat->mat.A[n+i] = A2[i];
   }
 }
 
