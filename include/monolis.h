@@ -220,7 +220,15 @@ void monolis_convert_connectivity_to_nodal_graph(
   int**    index,
   int**    item);
 
-
+/* sparse matrix handler */
+void monolis_init_matrix_BCSR(
+  MONOLIS* mat,
+  int      n,
+  int      np,
+  int      ndof,
+  int      nz,
+  int*     index,
+  int*     item);
 
 /* sparse matrix handler */
 void monolis_set_matrix_BCSR(
@@ -240,7 +248,14 @@ void monolis_set_matrix_BCSR_mat_val(
   int      nz,
   double*  A);
 
-
+/* set sparse matrix value by owned & ghosted parts of  matrix
+   this function is specified for petsc MPIAij matrix */
+void monolis_set_matrix_BCSR_val(
+  MONOLIS* mat,
+  int      nz1,
+  double*  A1,
+  int      nz2,
+  double*  A2);
 
 /* sparse matrix handler */
 /* add scalar value to sparse matrix */

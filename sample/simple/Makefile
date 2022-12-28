@@ -9,7 +9,7 @@ CPP    = -cpp
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(FC) -o $@ $(OBJS) -L../../lib -lmonolis -lmetis -llapack
+	$(FC) -o $@ $(OBJS) -L../../lib -lmonolis -llapack -lmetis
 
 %.o: %.f90
 	$(FC) $(FFLAGS) $(CPP) -I../../include -o $@ -c $<
