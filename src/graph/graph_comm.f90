@@ -177,7 +177,7 @@ contains
       send_n_list(id + 1) = in
     enddo
 
-    call mpi_alltoall(send_n_list, 1, MPI_INTEGER, &
+    call mpi_alltoall(MPI_IN_PLACE, 1, MPI_INTEGER, &
       send_n_list, 1, MPI_INTEGER, monolis%COM%comm, ierr)
 
     !> send 個数の確保
@@ -422,7 +422,7 @@ contains
       send_n_list(id + 1) = in
     enddo
 
-    call mpi_alltoall(send_n_list, 1, MPI_INTEGER, &
+    call mpi_alltoall(MPI_IN_PLACE, 1, MPI_INTEGER, &
       send_n_list, 1, MPI_INTEGER, comm, ierr)
 
     !> send 個数の確保
@@ -646,7 +646,7 @@ contains
       send_n_list(id + 1) = in
     enddo
 
-    call mpi_alltoall(send_n_list, 1, MPI_INTEGER, &
+    call mpi_alltoall(MPI_IN_PLACE, 1, MPI_INTEGER, &
       send_n_list, 1, MPI_INTEGER, monolis%COM%comm, ierr)
 
     !> send 個数の確保

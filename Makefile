@@ -3,8 +3,8 @@
 FC     = mpif90
 FFLAGS = -O2 -mtune=native -march=native -std=legacy -Wno-missing-include-dirs
 
-CC     = mpicc
-CFLAGS = -O2
+CC     = mpic++
+CFLAGS = -O2 
 
 MOD_DIR  = -J ./include
 
@@ -29,7 +29,7 @@ ifdef FLAGS
 		FC      = mpiifort
 		FFLAGS  = -O2 -fPIC -align array64byte
 		CC      = mpiicc
-		CFLAGS  = -O2 -fPIC -no-multibyte-chars
+		CFLAGS  = -O2 -fPIC -no-multibyte-chars 
 		MOD_DIR = -module ./include
 	endif
 

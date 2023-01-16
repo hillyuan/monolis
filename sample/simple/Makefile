@@ -1,7 +1,7 @@
 
 TARGET = main
 
-OBJS   = main.o
+OBJS   = main1.o
 FC     = mpif90
 CC     = mpicc
 CPP    = -cpp
@@ -18,7 +18,7 @@ $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -I../../include -o $@ -c $<
 
 clean:
-	rm main.o main
+	rm *.o main
 
 distclean:
 
