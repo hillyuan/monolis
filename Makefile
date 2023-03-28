@@ -1,10 +1,10 @@
 #> monolis Makefile
 
 FC     = mpif90
-FFLAGS = -O2 -mtune=native -march=native -std=legacy -Wno-missing-include-dirs
+FFLAGS = -O2 -fPIC -mtune=native -march=native -std=legacy -Wno-missing-include-dirs
 
 CC     = mpic++
-CFLAGS = -O2 
+CFLAGS = -O2 -fPIC
 
 MOD_DIR  = -J ./include
 
