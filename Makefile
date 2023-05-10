@@ -1,10 +1,10 @@
 #> monolis Makefile
 
 FC     = mpif90
-FFLAGS = -O2 -fPIC -mtune=native -march=native -std=legacy -Wno-missing-include-dirs
+FFLAGS = -O2 -mtune=native -march=native -std=legacy -Wno-missing-include-dirs
 
 CC     = mpic++
-CFLAGS = -O2 -fPIC
+CFLAGS = -O2 
 
 MOD_DIR  = -J ./include
 
@@ -28,8 +28,8 @@ ifdef FLAGS
 	ifeq ($(findstring INTEL, $(DFLAGS)), INTEL)
 		FC      = mpiifort
 		FFLAGS  = -O2 -fPIC -align array64byte
-		CC      = mpiicc
-		CFLAGS  = -O2 -fPIC -no-multibyte-chars 
+		CC      = mpiicc 
+		CFLAGS  = -O2 -fPIC -no-multibyte-chars
 		MOD_DIR = -module ./include
 	endif
 

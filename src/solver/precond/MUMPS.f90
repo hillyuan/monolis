@@ -137,7 +137,7 @@ contains
     call monolis_precond_mumps_set_rhs(monoMAT%NDOF*monoMAT%N, X, mumps%RHS)
     call DMUMPS(mumps)
     call monolis_precond_mumps_get_rhs(monoMAT%NDOF*monoMAT%N, mumps%RHS, Y)
-    call monolis_update_pre_R(monoCOM, monoMAT%NDOF, Y, t1)
+    call monolis_update_R(monoCOM, monoMAT%NDOF, Y, t1)
 
 !write(*,"(1p4e12.5)")Y
 !stop
@@ -149,6 +149,20 @@ contains
     type(monolis_prm) :: monoPRM
     type(monolis_com) :: monoCOM
     type(monolis_mat) :: monoMAT
+
+    if(monoPRM%is_prec_stored) return
+
+    is_factored = .false.
+
+#ifdef WITH_MUMPS
+    if(allocated(offset_list)) deallocate(offset_list)
+    if(allocated(offset_counts)) deallocate(offset_counts)
+
+    if(associated(mumps%IRN_loc)) deallocate(mumps%IRN_loc)
+    if(associated(mumps%JCN_loc)) deallocate(mumps%JCN_loc)
+    if(associated(mumps%A)) deallocate(mumps%A)
+    if(associated(mumps%RHS)) deallocate(mumps%RHS)
+#endif
   end subroutine monolis_precond_mumps_clear
 
   subroutine monolis_precond_mumps_get_nz(monoMAT, NZ, is_self)
